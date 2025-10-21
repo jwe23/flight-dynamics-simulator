@@ -15,7 +15,7 @@ This project demonstrates integrated software systems development, numerical sim
 
 ## Installation
 ```bash
-git clone https://github.com/YOUR_USERNAME/flight-dynamics-simulator.git
+git clone https://github.com/jw23/flight-dynamics-simulator.git
 cd flight-dynamics-simulator
 
 python -m venv venv
