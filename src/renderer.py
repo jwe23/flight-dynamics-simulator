@@ -23,29 +23,30 @@ class Renderer:
         pygame.display.flip()
     
     def _draw_aircraft(self, aircraft):
-        x = int(400 + aircraft.position[0] / 10)
-        y = int(500 - aircraft.position[2])
+        # Clamp position to prevent overflow
+        x = int(np.clip(400 + aircraft.position[0] / 10, -1000, 2000))
+        y = int(np.clip(500 - aircraft.position[2], -1000, 2000))
         
         size = 10
-        nose_x = x + int(size * np.cos(aircraft.pitch))
-        nose_y = y - int(size * np.sin(aircraft.pitch))
-        left_x = x + int(size * np.cos(aircraft.pitch + 2.5))
-        left_y = y - int(size * np.sin(aircraft.pitch + 2.5))
-        right_x = x + int(size * np.cos(aircraft.pitch - 2.5))
-        right_y = y - int(size * np.sin(aircraft.pitch - 2.5))
+        nose_x = int(x + size * np.cos(aircraft.pitch))
+        nose_y = int(y - size * np.sin(aircraft.pitch))
+        left_x = int(x + size * np.cos(aircraft.pitch + 2.5))
+        left_y = int(y - size * np.sin(aircraft.pitch + 2.5))
+        right_x = int(x + size * np.cos(aircraft.pitch - 2.5))
+        right_y = int(y - size * np.sin(aircraft.pitch - 2.5))
         
         pygame.draw.polygon(self.screen, self.aircraft_red, 
                           [(nose_x, nose_y), (left_x, left_y), (right_x, right_y)])
         
-        vel_end_x = x + int(aircraft.velocity[0] / 2)
-        vel_end_y = y - int(aircraft.velocity[2] / 2)
+        vel_end_x = int(x + aircraft.velocity[0] / 2)
+        vel_end_y = int(y - aircraft.velocity[2] / 2)
         pygame.draw.line(self.screen, self.velocity_green, (x, y), 
                         (vel_end_x, vel_end_y), 2)
     
     def _draw_hud(self, aircraft):
         hud_data = [
             f"Alt: {aircraft.position[2]:.1f}m",
-            f"Vel: {aircraft.velocity[0]:.1f}m/s",
+            f"Vel: {np.linalg.norm(aircraft.velocity):.1f}m/s",
             f"Throttle: {aircraft.throttle*100:.0f}%",
             f"Pitch: {np.degrees(aircraft.pitch):.1f}°"
         ]
