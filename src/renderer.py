@@ -59,13 +59,16 @@ class Renderer:
         
         self._draw_clouds()
         
-        horizon_y = int(self.height * 0.65 + aircraft.position[2] * 0.3)
-        horizon_y = max(self.height // 3, min(self.height - 50, horizon_y))
+        altitude = aircraft.position[2]
+        if altitude < 500:
+            horizon_y = self.height - int(200 - altitude * 0.4)
+        else:
+            horizon_y = -100
         
-        pygame.draw.rect(self.screen, self.ground_color, (0, horizon_y, self.width, self.height - horizon_y))
-        pygame.draw.line(self.screen, (100, 100, 100), (0, horizon_y), (self.width, horizon_y), 2)
-        
-        self._draw_ground_pattern(horizon_y)
+        if horizon_y < self.height:
+            pygame.draw.rect(self.screen, self.ground_color, (0, horizon_y, self.width, self.height - horizon_y))
+            pygame.draw.line(self.screen, (100, 100, 100), (0, horizon_y), (self.width, horizon_y), 2)
+            self._draw_ground_pattern(horizon_y)
         
         self._draw_aircraft(aircraft)
         self._draw_hud(aircraft)
