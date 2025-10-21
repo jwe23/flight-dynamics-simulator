@@ -30,9 +30,9 @@ python src/main.py
 ### Version 0.1 (MVP)
 - [X] Basic aircraft state management
 - [X] Simplified physics model
-- [ ] 2D visualization
-- [ ] Throttle control
-- [ ] 60 FPS game loop
+- [X] 2D visualization
+- [X] Throttle control
+- [X] 60 FPS game loop
 
 ### Version 0.2
 - [ ] Full 6DOF rigid body dynamics
