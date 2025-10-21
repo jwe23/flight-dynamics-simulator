@@ -4,9 +4,9 @@ import numpy as np
 
 class Controls:
     def __init__(self):
-        self.pitch_rate = 0.02
-        self.throttle_rate = 0.01
-        self.max_pitch = np.pi / 4
+        self.pitch_rate = 0.03
+        self.throttle_rate = 0.015
+        self.max_pitch = np.pi / 3
     
     def process_input(self, aircraft):
         keys = pygame.key.get_pressed()
