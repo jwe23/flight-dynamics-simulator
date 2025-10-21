@@ -1,18 +1,62 @@
-## Roadmap
+# Flight Dynamics Simulator
 
-**MVP (v0.1):**
-- [ ] Basic aircraft state (position, velocity)
-- [ ] Simple physics (thrust, drag, gravity)
+A real-time six-degree-of-freedom flight dynamics simulator with interactive visualization and telemetry analysis.
+
+## Overview
+
+This project demonstrates integrated software systems development, numerical simulation, and object-oriented programming principles applied to aerospace engineering problems.
+
+## Technical Stack
+
+- Python 3.10+
+- NumPy/SciPy for numerical computation and physics simulation
+- Pygame for real-time graphics and user interface
+- Matplotlib for data visualization and analysis
+
+## Installation
+```bash
+git clone https://github.com/YOUR_USERNAME/flight-dynamics-simulator.git
+cd flight-dynamics-simulator
+
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+pip install -r requirements.txt
+python src/main.py
+```
+
+## Development Roadmap
+
+### Version 0.1 (MVP)
+- [X] Basic aircraft state management
+- [X] Simplified physics model
 - [ ] 2D visualization
-- [ ] One control input
-- [ ] Game loop running at 60 FPS
+- [ ] Throttle control
+- [ ] 60 FPS game loop
 
-**v0.2:**
-- [ ] 3D visualization
-- [ ] Full flight controls
-- [ ] Better physics model
+### Version 0.2
+- [ ] Full 6DOF rigid body dynamics
+- [ ] Aerodynamic force calculations
+- [ ] 3D perspective rendering
+- [ ] Complete flight controls
+- [ ] Multiple camera views
 
-**v0.3:**
-- [ ] Telemetry
-- [ ] Autopilot
-- [ ] Data export
+### Version 0.3
+- [ ] Real-time telemetry dashboard
+- [ ] Flight data logging to CSV
+- [ ] Post-flight analysis with Matplotlib
+- [ ] PID-based autopilot
+
+### Version 0.4
+- [ ] Multiple aircraft configurations
+- [ ] Environmental effects (wind, turbulence)
+- [ ] Mission planning
+- [ ] Unit tests
+
+## License
+
+MIT License
+
+---
+
+Developed to demonstrate software engineering capabilities in simulation, numerical computing, and systems integration for aerospace applications.
