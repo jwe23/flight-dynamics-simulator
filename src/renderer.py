@@ -1,6 +1,7 @@
 # src/renderer.py
 import pygame
 import numpy as np
+import os
 
 class Renderer:
     def __init__(self, screen):
@@ -15,28 +16,25 @@ class Renderer:
         self.text_white = (255, 255, 255)
         self.hud_bg = (0, 0, 0, 180)
         
-        self.aircraft_sprite = self._create_aircraft_sprite()
+        self.aircraft_sprite = self._load_aircraft_sprite()
     
-    def _create_aircraft_sprite(self):
+    def _load_aircraft_sprite(self):
+        try:
+            sprite = pygame.image.load('airplane.png').convert_alpha()
+            sprite = pygame.transform.scale(sprite, (80, 80))
+            return sprite
+        except:
+            print("Warning: airplane.png not found, using fallback sprite")
+            return self._create_fallback_sprite()
+    
+    def _create_fallback_sprite(self):
         size = 60
         surface = pygame.Surface((size, size), pygame.SRCALPHA)
-        
         center = size // 2
-        
-        # Fuselage (simple rectangle)
         pygame.draw.rect(surface, (200, 200, 200), (center - 5, center - 20, 10, 40))
-        
-        # Wings (horizontal line)
         pygame.draw.rect(surface, (180, 180, 180), (center - 30, center - 3, 60, 6))
-        
-        # Nose (triangle pointing right)
         nose_points = [(center + 5, center - 5), (center + 20, center), (center + 5, center + 5)]
         pygame.draw.polygon(surface, (220, 50, 50), nose_points)
-        
-        # Tail
-        tail_points = [(center - 5, center - 20), (center - 15, center - 25), (center - 5, center - 15)]
-        pygame.draw.polygon(surface, (180, 180, 180), tail_points)
-        
         return surface
     
     def render(self, aircraft):
