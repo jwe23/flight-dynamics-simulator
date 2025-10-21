@@ -7,107 +7,88 @@ class Renderer:
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
-        self.font_large = pygame.font.Font(None, 36)
+        self.font_large = pygame.font.Font(None, 40)
         self.font_small = pygame.font.Font(None, 24)
         
-        self.sky_top = (70, 130, 180)
-        self.sky_bottom = (135, 206, 250)
-        self.ground_green = (34, 139, 34)
-        self.ground_brown = (139, 90, 43)
+        self.sky_color = (135, 206, 250)
+        self.ground_color = (34, 139, 34)
         self.text_white = (255, 255, 255)
-        self.hud_bg = (0, 0, 0, 200)
+        self.hud_bg = (0, 0, 0, 180)
+        
+        self.aircraft_sprite = self._create_aircraft_sprite()
+    
+    def _create_aircraft_sprite(self):
+        size = 60
+        surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        
+        center = size // 2
+        
+        # Fuselage (simple rectangle)
+        pygame.draw.rect(surface, (200, 200, 200), (center - 5, center - 20, 10, 40))
+        
+        # Wings (horizontal line)
+        pygame.draw.rect(surface, (180, 180, 180), (center - 30, center - 3, 60, 6))
+        
+        # Nose (triangle pointing right)
+        nose_points = [(center + 5, center - 5), (center + 20, center), (center + 5, center + 5)]
+        pygame.draw.polygon(surface, (220, 50, 50), nose_points)
+        
+        # Tail
+        tail_points = [(center - 5, center - 20), (center - 15, center - 25), (center - 5, center - 15)]
+        pygame.draw.polygon(surface, (180, 180, 180), tail_points)
+        
+        return surface
     
     def render(self, aircraft):
-        self._draw_sky()
-        self._draw_ground(aircraft)
+        self.screen.fill(self.sky_color)
+        
+        horizon_y = int(self.height * 0.65 + aircraft.position[2] * 0.3)
+        horizon_y = max(self.height // 3, min(self.height - 50, horizon_y))
+        
+        pygame.draw.rect(self.screen, self.ground_color, (0, horizon_y, self.width, self.height - horizon_y))
+        pygame.draw.line(self.screen, (100, 100, 100), (0, horizon_y), (self.width, horizon_y), 2)
+        
         self._draw_aircraft(aircraft)
         self._draw_hud(aircraft)
-        pygame.display.flip()
-    
-    def _draw_sky(self):
-        for y in range(self.height // 2):
-            ratio = y / (self.height // 2)
-            color = tuple(int(self.sky_top[i] + (self.sky_bottom[i] - self.sky_top[i]) * ratio) for i in range(3))
-            pygame.draw.line(self.screen, color, (0, y), (self.width, y))
-    
-    def _draw_ground(self, aircraft):
-        horizon = self.height // 2 + int(aircraft.position[2] * 0.5)
-        horizon = max(100, min(self.height - 100, horizon))
         
-        pygame.draw.rect(self.screen, self.ground_green, (0, horizon, self.width, self.height - horizon))
-        pygame.draw.line(self.screen, self.ground_brown, (0, horizon), (self.width, horizon), 2)
+        pygame.display.flip()
     
     def _draw_aircraft(self, aircraft):
         x = self.width // 2
         y = self.height // 2
         
-        scale = 2.5
-        pitch_deg = np.degrees(aircraft.pitch)
-        
-        fuselage = [
-            (-20, 0), (-15, -3), (-10, -4), (0, -4),
-            (15, -3), (20, -2), (25, 0), (20, 2),
-            (15, 3), (0, 4), (-10, 4), (-15, 3), (-20, 0)
-        ]
-        
-        wings = [
-            (-5, -4), (-5, -20), (0, -22), (5, -20), (5, -4),
-            (5, 4), (5, 20), (0, 22), (-5, 20), (-5, 4)
-        ]
-        
-        tail = [
-            (-20, 0), (-25, -8), (-23, -10), (-20, -3)
-        ]
-        
-        def rotate_and_scale(points):
-            angle = np.radians(pitch_deg)
-            result = []
-            for px, py in points:
-                px, py = px * scale, py * scale
-                rx = px * np.cos(angle) - py * np.sin(angle)
-                ry = px * np.sin(angle) + py * np.cos(angle)
-                result.append((int(x + rx), int(y - ry)))
-            return result
-        
-        fuselage_points = rotate_and_scale(fuselage)
-        wings_points = rotate_and_scale(wings)
-        tail_points = rotate_and_scale(tail)
-        
-        pygame.draw.polygon(self.screen, (200, 200, 200), wings_points)
-        pygame.draw.polygon(self.screen, (255, 255, 255), fuselage_points)
-        pygame.draw.polygon(self.screen, (220, 220, 220), tail_points)
-        
-        pygame.draw.aalines(self.screen, (100, 100, 100), True, fuselage_points)
-        pygame.draw.aalines(self.screen, (100, 100, 100), False, wings_points)
-        pygame.draw.aalines(self.screen, (100, 100, 100), False, tail_points)
+        angle = -np.degrees(aircraft.pitch)
+        rotated_sprite = pygame.transform.rotate(self.aircraft_sprite, angle)
+        rect = rotated_sprite.get_rect(center=(x, y))
+        self.screen.blit(rotated_sprite, rect)
     
     def _draw_hud(self, aircraft):
-        hud_surface = pygame.Surface((300, 200), pygame.SRCALPHA)
+        hud_surface = pygame.Surface((280, 180), pygame.SRCALPHA)
         hud_surface.fill(self.hud_bg)
-        self.screen.blit(hud_surface, (15, 15))
+        self.screen.blit(hud_surface, (20, 20))
         
         speed = np.linalg.norm(aircraft.velocity)
         
         hud_data = [
-            f"ALT: {aircraft.position[2]:.0f} m",
-            f"SPD: {speed:.0f} m/s",
+            f"ALT: {aircraft.position[2]:.0f}m",
+            f"SPD: {speed:.0f}m/s",
             f"THR: {aircraft.throttle*100:.0f}%",
             f"PITCH: {np.degrees(aircraft.pitch):.1f}°"
         ]
         
-        y_offset = 30
+        y_pos = 35
         for text in hud_data:
             surface = self.font_large.render(text, True, self.text_white)
-            self.screen.blit(surface, (30, y_offset))
-            y_offset += 40
+            self.screen.blit(surface, (35, y_pos))
+            y_pos += 38
         
-        controls = ["W/S: Throttle", "↑/↓: Pitch", "ESC: Exit"]
-        help_surface = pygame.Surface((200, 100), pygame.SRCALPHA)
+        help_surface = pygame.Surface((180, 90), pygame.SRCALPHA)
         help_surface.fill(self.hud_bg)
-        self.screen.blit(help_surface, (self.width - 215, 15))
+        self.screen.blit(help_surface, (self.width - 200, 20))
         
-        y_offset = 30
+        controls = ["W/S: Throttle", "UP/DN: Pitch", "ESC: Exit"]
+        y_pos = 35
         for text in controls:
             surface = self.font_small.render(text, True, self.text_white)
-            self.screen.blit(surface, (self.width - 200, y_offset))
-            y_offset += 30
+            self.screen.blit(surface, (self.width - 185, y_pos))
+            y_pos += 28
