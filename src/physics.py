@@ -8,12 +8,12 @@ class PhysicsEngine:
         
         self.mass = 1500.0
         self.wing_area = 16.0
-        self.max_thrust = 20000.0
+        self.max_thrust = 15000.0
         
-        self.CL0 = 0.3
-        self.CLalpha = 5.0
-        self.CD0 = 0.025
-        self.K = 0.04
+        self.CL0 = 0.2
+        self.CLalpha = 4.0
+        self.CD0 = 0.03
+        self.K = 0.05
         
     def calculate_forces(self, aircraft):
         vx = aircraft.velocity[0]
@@ -25,12 +25,13 @@ class PhysicsEngine:
         
         gamma = np.arctan2(vz, vx)
         alpha = aircraft.pitch - gamma
-        alpha = np.clip(alpha, -0.3, 0.5)
+        
+        alpha = np.clip(alpha, -0.2, 0.35)
         
         q = 0.5 * self.rho * V**2
         
         CL = self.CL0 + self.CLalpha * alpha
-        CL = np.clip(CL, -1.5, 1.8)
+        CL = np.clip(CL, -1.2, 1.5)
         
         CD = self.CD0 + self.K * CL**2
         
@@ -57,7 +58,12 @@ class PhysicsEngine:
     def update(self, aircraft, dt):
         force = self.calculate_forces(aircraft)
         acceleration = force / self.mass
+        
         aircraft.velocity += acceleration * dt
+        
+        aircraft.velocity[0] = np.clip(aircraft.velocity[0], 0, 200)
+        aircraft.velocity[2] = np.clip(aircraft.velocity[2], -50, 50)
+        
         aircraft.position[2] += aircraft.velocity[2] * dt
         
         if aircraft.position[2] <= 0:
