@@ -95,7 +95,7 @@ class Renderer:
         x = self.width // 2
         y = self.height // 2
         
-        angle = -np.degrees(aircraft.pitch)
+        angle = np.degrees(aircraft.pitch)
         rotated_sprite = pygame.transform.rotate(self.aircraft_sprite, angle)
         rect = rotated_sprite.get_rect(center=(x, y))
         self.screen.blit(rotated_sprite, rect)
