@@ -38,7 +38,7 @@ class PhysicsEngine:
         D = q * self.wing_area * CD
         
         T = aircraft.throttle * self.max_thrust
-        W = aircraft.mass * self.g
+        W = self.mass * self.g
         
         Lx = -L * np.sin(gamma)
         Lz = L * np.cos(gamma)
@@ -56,7 +56,7 @@ class PhysicsEngine:
     
     def update(self, aircraft, dt):
         force = self.calculate_forces(aircraft)
-        acceleration = force / aircraft.mass
+        acceleration = force / self.mass
         aircraft.velocity += acceleration * dt
         aircraft.position[2] += aircraft.velocity[2] * dt
         
